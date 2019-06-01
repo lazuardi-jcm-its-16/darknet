@@ -1107,13 +1107,13 @@ void draw_train_loss(mat_cv* img_src, int img_size, float avg_loss, float max_im
         static int old_batch = 0;
         if (k == 's' || current_batch == (max_batches - 1) || (current_batch / 100 > old_batch / 100)) {
             old_batch = current_batch;
-            save_mat_png(img, "chart.png");
+            //save_mat_png(img, "chart.png");
             cv::putText(img, "- Saved", cv::Point(260, img_size - 10), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(255, 0, 0), 1, CV_AA);
         }
         else
             cv::putText(img, "- Saved", cv::Point(260, img_size - 10), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.7, CV_RGB(255, 255, 255), 1, CV_AA);
 
-        if(current_batch%10 == 0)
+        if(current_batch%1000 == 0)
             save_mat_png(img, "/tesis/backup/chart.png");
         //if (mjpeg_port > 0) send_mjpeg((mat_cv *)&img, mjpeg_port, 500000, 100);
     }
