@@ -223,7 +223,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         calc_map_for_each = fmax(calc_map_for_each, 100);
         int next_map_calc = iter_map + calc_map_for_each;
         next_map_calc = fmax(next_map_calc, net.burn_in);
-        next_map_calc = fmax(next_map_calc, 1000);
+        next_map_calc = fmax(next_map_calc, 500);
         if (calc_map) {
             printf("\n (next mAP calculation at %d iterations) ", next_map_calc);
             if (mean_average_precision > 0) printf("\n Last accuracy mAP@0.5 = %2.2f %% ", mean_average_precision * 100);
