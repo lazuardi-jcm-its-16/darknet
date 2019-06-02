@@ -1207,14 +1207,14 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
                         truth[j].top,
                         truth[j].right - truth[j].left,
                         truth[j].bottom - truth[j].top,
-                        0,0,1);
+                        1,0.0f,0.0f,.1f);
             }
             
             
             char* buff_file_name = (char*)calloc(8192, sizeof(char));
             sprintf(buff_file_name, "/tesis/detect%s", path);
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
-            //save_image(buf[image_index], buff_file_name);
+            save_image(buf[image_index], buff_file_name);
 
             // difficult
             box_label *truth_dif = NULL;
