@@ -1887,7 +1887,7 @@ void run_detector(int argc, char **argv)
     else if (0 == strcmp(argv[2], "valid")) validate_detector(datacfg, cfg, weights, outfile);
     else if (0 == strcmp(argv[2], "recall")) validate_detector_recall(datacfg, cfg, weights);
     else if (0 == strcmp(argv[2], "map")) validate_detector_map(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL);
-    else if (0 == strcmp(argv[2], "map_bulk")) validate_detector_map(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL);
+    else if (0 == strcmp(argv[2], "map_bulk")) validate_detector_map_bulk(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL);
     else if (0 == strcmp(argv[2], "calc_anchors")) calc_anchors(datacfg, num_of_clusters, width, height, show);
     else if (0 == strcmp(argv[2], "demo")) {
         list *options = read_data_cfg(datacfg);
