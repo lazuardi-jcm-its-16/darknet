@@ -24,6 +24,8 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
+    float tresh_IoU = 0.75f;
+    
     list *options = read_data_cfg(datacfg);
     char *train_images = option_find_str(options, "train", "data/train.txt");
     char *valid_images = option_find_str(options, "valid", train_images);
@@ -226,7 +228,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         next_map_calc = fmax(next_map_calc, 500);
         if (calc_map) {
             printf("\n (next mAP calculation at %d iterations) ", next_map_calc);
-            if (mean_average_precision > 0) printf("\n Last accuracy mAP@0.5 = %2.2f %% ", mean_average_precision * 100);
+            if (mean_average_precision > 0) printf("\n Last accuracy mAP@%.2f = %2.2f %% ", tresh_IoU, mean_average_precision * 100);
         }
 
         if (net.cudnn_half) {
@@ -257,9 +259,10 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             // combine Training and Validation networks
             //network net_combined = combine_train_valid_networks(net, net_map);
 
+            
             iter_map = i;
-            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, 0.5, 0, &net_map);// &net_combined);
-            printf("\n mean_average_precision (mAP@0.5) = %f \n", mean_average_precision);
+            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map);// &net_combined);
+            printf("\n mean_average_precision (mAP@%.2f) = %f \n", tresh_IoU, mean_average_precision);
             draw_precision = 1;
         }
 #ifdef OPENCV
