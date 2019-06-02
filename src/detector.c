@@ -7,7 +7,6 @@
 #include "box.h"
 #include "demo.h"
 #include "option_list.h"
-#include <string.h>
 
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T
@@ -1195,9 +1194,8 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             printf("%s\n",(char*)"masuk bro");
             
             //char buff_file_name[1024];
-            char* base_name = basename(path);
             //sprintf(buff_file_name, "/tesis/detect/%s", basename(path));
-            printf("%s\n",base_name);
+            printf("%s\n",path);
             
             /*
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
