@@ -1195,7 +1195,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             char* buff_file_name = (char*)calloc(8192, sizeof(char));
             sprintf(buff_file_name, "/tesis/detect%s", path);
             
-            draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            //draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
            
             char labelpath[4096];
             replace_image_to_label(path, labelpath);
@@ -1212,6 +1212,8 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
                         truth[j].right - truth[j].left,
                         truth[j].bottom - truth[j].top,
                         0,0,1);
+                
+                printf("\n%.2f",truth[j].left);
             }
             
             save_image(buf[image_index], buff_file_name);
