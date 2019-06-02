@@ -1195,10 +1195,6 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             char* buff_file_name = (char*)calloc(8192, sizeof(char));
             sprintf(buff_file_name, "/tesis/detect%s", path);
             
-            //printf("%s\n",(char*)"masuk bro");
-            //printf("%s\n", path);
-            //printf("%s\n", bufferss);
-            
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
             save_image(buf[image_index], buff_file_name);
 
@@ -1209,6 +1205,14 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             int i, j;
             for (j = 0; j < num_labels; ++j) {
                 truth_classes_count[truth[j].id]++;
+                
+                draw_box_width(
+                        buf[image_index],
+                        truth[j].left,
+                        truth[j].top,
+                        truth[j].right - truth[j].left,
+                        truth[j].bottom - truth[j].top,
+                        0,0,1);
             }
 
             // difficult
