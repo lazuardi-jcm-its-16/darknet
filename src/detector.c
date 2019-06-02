@@ -1192,10 +1192,14 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
             
             printf("%s\n",(char*)"masuk bro");
+            printf("%s\n", path);
+
+            char* bufferss = (char*)calloc(8192, sizeof(char));
+            sprintf(bufferss, "/tesis/detect%s", path);
+            printf("%s\n", bufferss);
             
             //char buff_file_name[1024];
             //sprintf(buff_file_name, "/tesis/detect/%s", basename(path));
-            printf("%s\n",path);
             
             /*
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
