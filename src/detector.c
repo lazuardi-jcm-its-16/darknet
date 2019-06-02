@@ -1195,7 +1195,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             replace_image_to_label(path, labelpath);
             int num_labels = 0;
             box_label *truth = read_boxes(labelpath, &num_labels);
-            printf("\n%d",num_labels);
+            printf("\nHallo %d",num_labels);
             
             int i, j;
             for (j = 0; j < num_labels; ++j) {
