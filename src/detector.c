@@ -1205,8 +1205,8 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
                         buf[image_index],
                         truth[j].left,
                         truth[j].top,
-                        truth[j].right - truth[j].left,
-                        truth[j].bottom - truth[j].top,
+                        truth[j].right,
+                        truth[j].bottom,
                         1,0.0f,0.0f,.1f);
             }
             
