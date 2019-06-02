@@ -1194,6 +1194,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             char buff_file_name[1024];
             sprintf(buff_file_name, "/tesis/detect/%s", basename(path));
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            printf("%s\n",buff_file_name);
             save_image(buf[image_index], buff_file_name);
 
             char labelpath[4096];
