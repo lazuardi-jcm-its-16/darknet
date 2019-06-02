@@ -1196,8 +1196,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             sprintf(buff_file_name, "/tesis/detect%s", path);
             
             draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
-            save_image(buf[image_index], buff_file_name);
-
+           
             char labelpath[4096];
             replace_image_to_label(path, labelpath);
             int num_labels = 0;
@@ -1214,6 +1213,8 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
                         truth[j].bottom - truth[j].top,
                         0,0,1);
             }
+            
+            save_image(buf[image_index], buff_file_name);
 
             // difficult
             box_label *truth_dif = NULL;
