@@ -297,7 +297,6 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff_mAP[256];
             sprintf(buff_mAP, "%s/%s_last.mAP", backup_directory, base);
             save_mAP(list_mAP, buff_mAP);
-            free_list_contents(list_mAP);
         }
 
         if (i >= (iter_save_last + 10) || i % 10 == 0) {
@@ -313,7 +312,6 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff_loss[256];
             sprintf(buff_loss, "%s/%s_last.loss", backup_directory, base);
             save_loss(list_loss,buff_loss);
-            free_list(list_loss);
         }
         free_data(train);
     }
@@ -350,10 +348,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         free_network(net_map);
     }
     
-    free_list_contents(list_mAP);
     free_list(list_mAP);
-    
-    free_list_contents(list_loss);
     free_list(list_loss);
 }
 

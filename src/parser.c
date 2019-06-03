@@ -1104,13 +1104,48 @@ void save_mAP(list *list_mAP, char* filename) {
     FILE *fp = fopen(filename, "ab");
     if(!fp) file_error(filename);
     
-    _mAP **array_of_mAP = (_mAP **)list_to_array(list_mAP);
     printf("size mAP: %d\n",list_mAP->size);
     
+    char cr, lf;
+    int iterBatch;
+    int TP;
+    int TN;
+    int FP;
+    int FN;
+    float precision;
+    float recall;
+    float F1;
+    float mAPValue;
+    float averageIoU;
+    
     for(int i=0; i<list_mAP->size; i++) {
-        //fwrite('\r', sizeof(char), 1, fp);
-        //fwrite('\n', sizeof(char), 1, fp);
-        //fwrite(array_of_mAP[i], sizeof(float), sizeof(_mAP), fp);
+        _mAP* item_mAP = list_pop(list_mAP);
+        
+        cr = 0x0d;
+        lf = 0x0a;
+        iterBatch = item_mAP->iterBatch;
+        TP = item_mAP->TP;
+        TN = item_mAP->TN;
+        FP = item_mAP->FP;
+        FN = item_mAP->FN;
+        precision = item_mAP->precision;
+        recall = item_mAP->recall;
+        F1 = item_mAP->F1;
+        mAPValue = item_mAP->mAPValue;
+        averageIoU = item_mAP->averageIoU;
+
+        fwrite(&cr, sizeof(char), 1, fp);
+        fwrite(&lf, sizeof(char), 1, fp);
+        fwrite(&iterBatch, sizeof(int), 1, fp);
+        fwrite(&TP, sizeof(int), 1, fp);
+        fwrite(&TN, sizeof(int), 1, fp);
+        fwrite(&FP, sizeof(int), 1, fp);
+        fwrite(&FN, sizeof(int), 1, fp);
+        fwrite(&precision, sizeof(float), 1, fp);
+        fwrite(&recall, sizeof(float), 1, fp);
+        fwrite(&F1, sizeof(float), 1, fp);
+        fwrite(&mAPValue, sizeof(float), 1, fp);
+        fwrite(&averageIoU, sizeof(float), 1, fp);
     }
      
     fclose(fp);
@@ -1121,18 +1156,19 @@ void save_loss(list *list_loss, char* filename) {
     FILE *fp = fopen(filename, "ab");
     if(!fp) file_error(filename);
     
-    _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
     
     char cr, lf;
     float iter,avg_loss,max_img_loss;
     
     for(int i=0; i<list_loss->size; i++) {
+        _lossAcc* item_loss = list_pop(list_loss);
+        
         cr = 0x0d;
         lf = 0x0a;
-        iter = array_of_loss[i]->iterBatch;
-        avg_loss = array_of_loss[i]->avgLoss;
-        max_img_loss = array_of_loss[i]->maxImgLoss;
+        iter = item_loss->iterBatch;
+        avg_loss = item_loss->avgLoss;
+        max_img_loss = item_loss->maxImgLoss;
 
         fwrite(&cr, sizeof(char), 1, fp);
         fwrite(&lf, sizeof(char), 1, fp);
