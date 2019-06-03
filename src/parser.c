@@ -1167,7 +1167,7 @@ void save_loss(list *list_loss, char* filename) {
     char lf = 0x0a;
         
     for(int i=0; i<list_loss->size; i++) {
-        _lossAcc *loss = (_lossAcc*)list_loss->front->val;
+        _lossAcc *loss = (_lossAcc*)list_loss->back->val;
         
         int iter = loss->iterBatch;
         float avg_loss = loss->avgLoss;
