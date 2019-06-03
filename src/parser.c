@@ -1108,9 +1108,9 @@ void save_mAP(list *list_mAP, char* filename) {
     printf("size mAP: %d\n",list_mAP->size);
     
     for(int i=0; i<list_mAP->size; i++) {
-        fwrite('\r', sizeof(char), 1, fp);
-        fwrite('\n', sizeof(char), 1, fp);
-        fwrite(array_of_mAP[i], sizeof(float), sizeof(_mAP), fp);
+        //fwrite('\r', sizeof(char), 1, fp);
+        //fwrite('\n', sizeof(char), 1, fp);
+        //fwrite(array_of_mAP[i], sizeof(float), sizeof(_mAP), fp);
     }
      
     fclose(fp);
@@ -1125,9 +1125,10 @@ void save_loss(list *list_loss, char* filename) {
     printf("size loss: %d\n",list_loss->size);
     
     for(int i=0; i<list_loss->size; i++) {
-        fwrite('\r', sizeof(char), 1, fp);
-        fwrite('\n', sizeof(char), 1, fp);
-        fwrite(array_of_loss[i], sizeof(float), sizeof(_mAP), fp);
+        printf("debug loss: %.2f\n",array_of_loss[i]->avgLoss);
+        //fwrite('\r', sizeof(char), 1, fp);
+        //fwrite('\n', sizeof(char), 1, fp);
+        //fwrite(array_of_loss[i], sizeof(float), sizeof(_mAP), fp);
     }
     
     fclose(fp);
