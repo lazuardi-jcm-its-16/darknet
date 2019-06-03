@@ -292,6 +292,12 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff[256];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
             save_weights(net, buff);
+            
+            //simpan ke binary mAP
+            char buff_mAP[256];
+            sprintf(buff_mAP, "%s/%s_last.mAP", backup_directory, base);
+            save_mAP(list_mAP, buff_mAP);
+            free_list_contents(list_mAP);
         }
 
         if (i >= (iter_save_last + 10) || i % 10 == 0) {
@@ -302,12 +308,6 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff[256];
             sprintf(buff, "%s/%s_last.weights", backup_directory, base);
             save_weights(net, buff);
-            
-            //simpan ke binary mAP
-            char buff_mAP[256];
-            sprintf(buff_mAP, "%s/%s_last.mAP", backup_directory, base);
-            save_mAP(list_mAP, buff_mAP);
-            free_list_contents(list_mAP);
             
             //simpan ke binary loss
             char buff_loss[256];
