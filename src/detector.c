@@ -26,6 +26,8 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 {
     list *list_mAP = make_list();
     list *list_loss = make_list();
+    _lossAcc *lossAcc = 0;
+    
     float tresh_IoU = 0.75f;
     
     list *options = read_data_cfg(datacfg);
@@ -152,8 +154,6 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     int count = 0;
     //while(i*imgs < N*120){
     while (get_current_batch(net) < net.max_batches) {
-        _lossAcc lossAcc;
-        
         if (l.random && count++ % 10 == 0) {
             printf("Resizing\n");
             float random_val = rand_scale(1.4);    // *x or /x
@@ -273,12 +273,15 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             draw_precision = 1;
         }
         
-        lossAcc.iterBatch = i;
-        lossAcc.avgLoss = avg_loss;
-        lossAcc.maxImgLoss = max_img_loss;
         
-        printf("%d %.5f %.5f\n",lossAcc.iterBatch,lossAcc.avgLoss,lossAcc.maxImgLoss);
-        list_insert(list_loss, &lossAcc);
+        lossAcc = (_lossAcc*)malloc(sizeof(_lossAcc));
+        list_insert(list_loss, lossAcc);
+        
+        lossAcc->iterBatch = i;
+        lossAcc->avgLoss = avg_loss;
+        lossAcc->maxImgLoss = max_img_loss;
+        
+        printf("%d %.5f %.5f\n",lossAcc->iterBatch,lossAcc->avgLoss,lossAcc->maxImgLoss);
         
 #ifdef OPENCV
         draw_train_loss(img, img_size, avg_loss, max_img_loss, i, net.max_batches, mean_average_precision, draw_precision, "mAP%", dont_show, mjpeg_port);
