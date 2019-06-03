@@ -1164,7 +1164,8 @@ void save_loss(list *list_loss, char* filename) {
     printf("size loss: %d\n",list_loss->size);
     
     char cr, lf;
-    float iter,avg_loss,max_img_loss;
+    int iter;
+    float avg_loss,max_img_loss;
     
     for(int i=0; i<list_loss->size; i++) {
         cr = 0x0d;
