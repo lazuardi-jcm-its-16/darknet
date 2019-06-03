@@ -1101,7 +1101,7 @@ void save_weights(network net, char *filename)
 
 void save_mAP(list *list_mAP, char* filename) {
     fprintf(stderr, "Saving mAP to %s\n", filename);
-    FILE *fp = fopen(filename, "wb");
+    FILE *fp = fopen(filename, "ab");
     if(!fp) file_error(filename);
     
     _mAP **array_of_mAP = (_mAP **)list_to_array(list_mAP);
@@ -1118,17 +1118,16 @@ void save_mAP(list *list_mAP, char* filename) {
 
 void save_loss(list *list_loss, char* filename) {
     fprintf(stderr, "Saving loss to %s\n", filename);
-    FILE *fp = fopen(filename, "wb");
+    FILE *fp = fopen(filename, "ab");
     if(!fp) file_error(filename);
     
     _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
     
     for(int i=0; i<list_loss->size; i++) {
-        printf("debug loss: %.2f\n",array_of_loss[i]->avgLoss);
-        //fwrite('\r', sizeof(char), 1, fp);
-        //fwrite('\n', sizeof(char), 1, fp);
-        //fwrite(array_of_loss[i], sizeof(float), sizeof(_mAP), fp);
+        fwrite('\r', sizeof(char), 1, fp);
+        fwrite('\n', sizeof(char), 1, fp);
+        fwrite(&array_of_loss[i], sizeof(float), sizeof(_mAP), fp);
     }
     
     fclose(fp);
