@@ -403,7 +403,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             }
             if (alphabet) {
                 char labelstr[4096] = { 0 };
-                strcat(labelstr, names[selected_detections[i].best_class]);
+                //strcat(labelstr, names[selected_detections[i].best_class]);
                 int j;
                 for (j = 0; j < classes; ++j) {
                     if (selected_detections[i].det.prob[j] > thresh && j != selected_detections[i].best_class) {
@@ -411,7 +411,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
                         strcat(labelstr, names[j]);
                     }
                 }
-                labelstr = "IoU=.75";
+                strcat(labelstr, "IoU=.75");
                 image label = get_label_v3(alphabet, labelstr, (im.h*.01));
                 draw_label(im, top + width, left, label, rgb);
                 free_image(label);
