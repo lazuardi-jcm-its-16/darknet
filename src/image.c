@@ -411,7 +411,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
                         strcat(labelstr, names[j]);
                     }
                 }
-                image label = get_label_v3(alphabet, labelstr, (im.h*.03));
+                image label = get_label_v3(alphabet, labelstr, (im.h*.01));
                 draw_label(im, top + width, left, label, rgb);
                 free_image(label);
             }
