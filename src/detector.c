@@ -25,10 +25,7 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
     list *list_mAP = make_list();
-    _mAP mAP;
-    
     list *list_loss = make_list();
-    _lossAcc lossAcc;
     float tresh_IoU = 0.75f;
     
     list *options = read_data_cfg(datacfg);
@@ -155,6 +152,8 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     int count = 0;
     //while(i*imgs < N*120){
     while (get_current_batch(net) < net.max_batches) {
+        _lossAcc lossAcc;
+        
         if (l.random && count++ % 10 == 0) {
             printf("Resizing\n");
             float random_val = rand_scale(1.4);    // *x or /x
@@ -264,6 +263,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             // combine Training and Validation networks
             //network net_combined = combine_train_valid_networks(net, net_map);
 
+            _mAP mAP;
             mAP.iterBatch = i;
             iter_map = i;
             mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map, &mAP);// &net_combined);
@@ -272,7 +272,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             
             draw_precision = 1;
         }
-        printf("%d\n",i);
+        
         lossAcc.iterBatch = i;
         lossAcc.avgLoss = avg_loss;
         lossAcc.maxImgLoss = max_img_loss;
