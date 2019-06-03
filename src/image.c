@@ -371,6 +371,8 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             if (right > im.w - 1) right = im.w - 1;
             if (top < 0) top = 0;
             if (bot > im.h - 1) bot = im.h - 1;
+            
+            printf("pred: %.2f %.2f %.2f %.2f %.d %.d\n",b.x,b.y,b.w,b.h,im.w,im.h);
 
             //int b_x_center = (left + right) / 2;
             //int b_y_center = (top + bot) / 2;
@@ -395,7 +397,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             //save_image(cropped_im, image_name);
             //free_image(cropped_im);
 
-            printf("pred: %d %d %d %d\n",left,top,right,bot);
+            
             if (im.c == 1) {
                 draw_box_width_bw(im, left, top, right, bot, width, 0.8);    // 1 channel Black-White
             }
