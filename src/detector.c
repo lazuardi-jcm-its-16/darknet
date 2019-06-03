@@ -1201,8 +1201,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             for (j = 0; j < num_labels; ++j) {
                 truth_classes_count[truth[j].id]++;
                 
-                printf("pred: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,buf[image_index].w,buf[image_index].h);
-                printf("truth: %d %d %d %d\n",truth[j].left,truth[j].top,truth[j].right,truth[j].bottom);
+                printf("truth: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,buf[image_index].w,buf[image_index].h);
                 /*
                 draw_box_width(
                         buf[image_index],
