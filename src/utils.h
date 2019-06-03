@@ -28,6 +28,7 @@ int read_all_fail(int fd, char *buffer, size_t bytes);
 int write_all_fail(int fd, char *buffer, size_t bytes);
 LIB_API void find_replace(const char* str, char* orig, char* rep, char* output);
 void replace_image_to_label(const char* input_path, char* output_path);
+char *remove_ext (char* mystr, char dot, char sep);
 void error(const char *s);
 void malloc_error();
 void file_error(char *s);
