@@ -276,6 +276,8 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         lossAcc.iterBatch = i;
         lossAcc.avgLoss = avg_loss;
         lossAcc.maxImgLoss = max_img_loss;
+        
+        printf("%d %.5f %.5f\n",lossAcc.iterBatch,lossAcc.avgLoss,lossAcc.maxImgLoss);
         list_insert(list_loss, &lossAcc);
         
 #ifdef OPENCV
