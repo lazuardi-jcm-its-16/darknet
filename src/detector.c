@@ -1201,15 +1201,22 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             for (j = 0; j < num_labels; ++j) {
                 truth_classes_count[truth[j].id]++;
                 
-                printf("truth: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,buf[image_index].w,buf[image_index].h);
-                /*
-                draw_box_width(
-                        buf[image_index],
-                        truth[j].left,
-                        truth[j].top,
-                        truth[j].right,
-                        truth[j].bottom,
-                        1,0.0f,0.0f,.1f);*/
+                int width = buf[image_index].h * .003;
+                if (width < 1)
+                    width = 1;
+
+                int left = (truth[j].x - truth[j].w / 2.)*buf[image_index].w;
+                int right = (truth[j].x + truth[j].w / 2.)*buf[image_index].w;
+                int top = (truth[j].y - truth[j].h / 2.)*buf[image_index].h;
+                int bot = (truth[j].y + truth[j].h / 2.)*buf[image_index].h;
+
+                if (left < 0) left = 0;
+                if (right > buf[image_index].w - 1) right = buf[image_index].w - 1;
+                if (top < 0) top = 0;
+                if (bot > buf[image_index].h - 1) bot = buf[image_index].h - 1;
+
+                //printf("truth: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,buf[image_index].w,buf[image_index].h);
+                draw_box_width(buf[image_index], left, top, right, bot, width, 0.0f,1.0f,0.0f); // 3 channels RGB            
             }
             
             char* filename = remove_ext(path);
