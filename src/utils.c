@@ -270,7 +270,10 @@ void replace_image_to_label(const char* input_path, char* output_path)
 char *remove_ext (char* mystr) {
     char* ts1 = strdup(mystr);
     char* filename = basename(ts1);
-    
+    char* lastdot = strrchr (filename, ".");
+    if (lastdot != NULL) {
+        *lastdot = '\0';
+    }
     return filename;
     /*char *retstr, *lastdot, *lastsep;
 
