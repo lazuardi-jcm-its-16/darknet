@@ -1127,9 +1127,9 @@ void save_loss(list *list_loss, char* filename) {
     for(int i=0; i<list_loss->size; i++) {
         fwrite('\r', sizeof(char), 1, fp);
         fwrite('\n', sizeof(char), 1, fp);
-        fwrite(array_of_loss[i]->iterBatch, sizeof(int), 1, fp);
-        fwrite(array_of_loss[i]->avgLoss, sizeof(float), 1, fp);
-        fwrite(array_of_loss[i]->maxImgLoss, sizeof(float), 1, fp);
+        fwrite(&array_of_loss[i]->iterBatch, sizeof(int), 1, fp);
+        fwrite(&array_of_loss[i]->avgLoss, sizeof(float), 1, fp);
+        fwrite(&array_of_loss[i]->maxImgLoss, sizeof(float), 1, fp);
     }
     
     fclose(fp);
