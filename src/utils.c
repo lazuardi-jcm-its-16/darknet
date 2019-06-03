@@ -271,7 +271,7 @@ char *remove_ext (char* mystr) {
     char* ts1 = strdup(mystr);
     char* filename = basename(ts1);
     
-    return filenamel
+    return filename;
     /*char *retstr, *lastdot, *lastsep;
 
     // Error checks and allocate string.
