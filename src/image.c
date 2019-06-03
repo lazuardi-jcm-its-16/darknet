@@ -372,7 +372,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             if (top < 0) top = 0;
             if (bot > im.h - 1) bot = im.h - 1;
             
-            printf("pred: %.2f %.2f %.2f %.2f %.d %.d\n",b.x,b.y,b.w,b.h,im.w,im.h);
+            //printf("pred: %.2f %.2f %.2f %.2f %.d %.d\n",b.x,b.y,b.w,b.h,im.w,im.h);
 
             //int b_x_center = (left + right) / 2;
             //int b_y_center = (top + bot) / 2;

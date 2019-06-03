@@ -1099,6 +1099,28 @@ void save_weights(network net, char *filename)
     save_weights_upto(net, filename, net.n);
 }
 
+void save_mAP(_mAP* mAP, char* filename) {
+    fprintf(stderr, "Saving mAP to %s\n", filename);
+    FILE *fp = fopen(filename, "wb");
+    if(!fp) file_error(filename);
+    
+    fwrite('\r', sizeof(char), 1, fp);
+    fwrite('\n', sizeof(char), 1, fp);
+    fwrite(mAP, sizeof(float), sizeof(_mAP), fp);
+    fclose(fp);
+}
+
+void save_loss(_lossAcc* lossAcc, char* filename) {
+    fprintf(stderr, "Saving loss to %s\n", filename);
+    FILE *fp = fopen(filename, "wb");
+    if(!fp) file_error(filename);
+    
+    fwrite('\r', sizeof(char), 1, fp);
+    fwrite('\n', sizeof(char), 1, fp);
+    fwrite(lossAcc, sizeof(float), sizeof(_mAP), fp);
+    fclose(fp);
+}
+
 void transpose_matrix(float *a, int rows, int cols)
 {
     float* transpose = (float*)calloc(rows * cols, sizeof(float));

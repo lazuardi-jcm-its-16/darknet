@@ -24,6 +24,8 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
+    _mAP mAP;
+    _lossAcc lossAcc;
     float tresh_IoU = 0.75f;
     
     list *options = read_data_cfg(datacfg);
@@ -222,10 +224,10 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         i = get_current_batch(net);
 
         int calc_map_for_each = 4 * train_images_num / (net.batch * net.subdivisions);  // calculate mAP for each 4 Epochs
-        calc_map_for_each = fmax(calc_map_for_each, 100);
+        //calc_map_for_each = fmax(calc_map_for_each, 100);
         int next_map_calc = iter_map + calc_map_for_each;
-        next_map_calc = fmax(next_map_calc, net.burn_in);
-        next_map_calc = fmax(next_map_calc, 500);
+        //next_map_calc = fmax(next_map_calc, net.burn_in);
+        //next_map_calc = fmax(next_map_calc, 500);
         if (calc_map) {
             printf("\n (next mAP calculation at %d iterations) ", next_map_calc);
             if (mean_average_precision > 0) printf("\n Last accuracy mAP@%.2f = %2.2f %% ", tresh_IoU, mean_average_precision * 100);
@@ -259,19 +261,33 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             // combine Training and Validation networks
             //network net_combined = combine_train_valid_networks(net, net_map);
 
-            
+            mAP.iterBatch = i;
             iter_map = i;
-            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map);// &net_combined);
+            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map, &mAP);// &net_combined);
             printf("\n mean_average_precision (mAP@%.2f) = %f \n", tresh_IoU, mean_average_precision);
+            
             draw_precision = 1;
+            
+            //simpan ke binary mAP
+            char buff[256];
+            sprintf(buff, "%s/%s_last.mAP", backup_directory, base);
+            save_mAP(&mAP, buff);
         }
+        
+        lossAcc.iterBatch = i;
+        lossAcc.avgLoss = avg_loss;
+        lossAcc.maxImgLoss = max_img_loss;
+        
+        char buff_loss[256];
+        sprintf(buff_loss, "%s/%s_last.loss", backup_directory, base);
+        save_loss(&lossAcc,buff_loss);
 #ifdef OPENCV
         draw_train_loss(img, img_size, avg_loss, max_img_loss, i, net.max_batches, mean_average_precision, draw_precision, "mAP%", dont_show, mjpeg_port);
 #endif    // OPENCV
 
         //if (i % 1000 == 0 || (i < 1000 && i % 100 == 0)) {
         //if (i % 100 == 0) {
-        if (i >= (iter_save + 1000) || i % 1000 == 0) {
+        if (i >= (iter_save + 500) || i % 500 == 0) {
             iter_save = i;
 #ifdef GPU
             if (ngpus != 1) sync_nets(nets, ngpus, 0);
@@ -634,7 +650,7 @@ int detections_comparator(const void *pa, const void *pb)
     return 0;
 }
 
-float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, float thresh_calc_avg_iou, const float iou_thresh, const int map_points, network *existing_net)
+float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, float thresh_calc_avg_iou, const float iou_thresh, const int map_points, network *existing_net, _mAP* mAP)
 {
     int j;
     list *options = read_data_cfg(datacfg);
@@ -1022,7 +1038,8 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
 
     printf(" for thresh = %0.2f, TP = %d, FP = %d, FN = %d, average IoU = %2.2f %% \n",
         thresh_calc_avg_iou, tp_for_thresh, fp_for_thresh, unique_truth_count - tp_for_thresh, avg_iou * 100);
-
+    
+    
     mean_average_precision = mean_average_precision / classes;
     printf("\n IoU threshold = %2.0f %%, ", iou_thresh * 100);
     if (map_points) printf("used %d Recall-points \n", map_points);
@@ -1030,6 +1047,18 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
 
     printf(" mean average precision (mAP@%0.2f) = %f, or %2.2f %% \n", iou_thresh, mean_average_precision, mean_average_precision * 100);
 
+    if(mAP != 0) {
+        mAP->TP = tp_for_thresh;
+        mAP->FP = fp_for_thresh;
+        mAP->FN = unique_truth_count - tp_for_thresh;
+        mAP->averageIoU = avg_iou;
+        mAP->F1 = f1_score;
+        mAP->precision = cur_precision;
+        mAP->recall = cur_recall;
+        mAP->mAPValue = mean_average_precision;
+    }
+    
+    
     for (i = 0; i < classes; ++i) {
         free(pr[i]);
     }
@@ -1523,6 +1552,61 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
     return mean_average_precision;
 }
 
+void check(char *datacfg) {
+    list *options = read_data_cfg(datacfg);
+    char *valid_images = option_find_str(options, "valid", "data/train.txt");
+    
+    list *plist = get_paths(valid_images);
+    char **paths = (char **)list_to_array(plist);
+
+    int m = plist->size;
+    
+    for(int i = 0; i < m; i++) {
+        char *path = paths[i];
+        //printf("%s\n",path);
+        
+        image im = load_image(path, 0, 0, 3);
+        
+        char labelpath[4096];
+        replace_image_to_label(path, labelpath);
+        int num_labels = 0;
+        box_label *truth = read_boxes(labelpath, &num_labels);
+
+        for (int j = 0; j < num_labels; ++j) {
+            
+            int width = im.h * .003;
+            if (width < 1)
+                width = 1;
+
+            int left = (truth[j].x - truth[j].w / 2.)*im.w;
+            int right = (truth[j].x + truth[j].w / 2.)*im.w;
+            int top = (truth[j].y - truth[j].h / 2.)*im.h;
+            int bot = (truth[j].y + truth[j].h / 2.)*im.h;
+
+            if (left < 0) left = 0;
+            if (right > im.w - 1) right = im.w - 1;
+            if (top < 0) top = 0;
+            if (bot > im.h - 1) bot = im.h - 1;
+
+            //printf("truth: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,im.w,im.h);
+            draw_box_width(im, left, top, right, bot, width, 0.0f,1.0f,0.0f); // 3 channels RGB          
+        }
+
+        char* filename = remove_ext(path);
+        char* filename2save = (char*)calloc(8192, sizeof(char));
+        sprintf(filename2save, "own-training/check/%s", filename);
+        //printf("%s\n",filename2save);
+        save_image(im, filename2save);
+    }
+    
+  
+    // free memory
+    free_list_contents_kvp(options);
+    free_list(options);
+
+}
+
+
 typedef struct {
     float w, h;
 } anchors_t;
@@ -1907,8 +1991,9 @@ void run_detector(int argc, char **argv)
     else if (0 == strcmp(argv[2], "train")) train_detector(datacfg, cfg, weights, gpus, ngpus, clear, dont_show, calc_map, mjpeg_port, show_imgs);
     else if (0 == strcmp(argv[2], "valid")) validate_detector(datacfg, cfg, weights, outfile);
     else if (0 == strcmp(argv[2], "recall")) validate_detector_recall(datacfg, cfg, weights);
-    else if (0 == strcmp(argv[2], "map")) validate_detector_map(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL);
+    else if (0 == strcmp(argv[2], "map")) validate_detector_map(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL, NULL);
     else if (0 == strcmp(argv[2], "map_bulk")) validate_detector_map_bulk(datacfg, cfg, weights, thresh, iou_thresh, map_points, NULL);
+    else if (0 == strcmp(argv[2], "check")) check(datacfg);
     else if (0 == strcmp(argv[2], "calc_anchors")) calc_anchors(datacfg, num_of_clusters, width, height, show);
     else if (0 == strcmp(argv[2], "demo")) {
         list *options = read_data_cfg(datacfg);
