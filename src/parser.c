@@ -1170,7 +1170,7 @@ void save_loss(list *list_loss, char* filename) {
         float avg_loss = array_of_loss[i]->avgLoss;
         float max_img_loss = array_of_loss[i]->maxImgLoss;
         
-        printf("%d %.5f %.5f\n",array_of_loss[i]->iterBatch,array_of_loss[i]->avgLoss,array_of_loss[i]->maxImgLoss);
+        //printf("%d %.5f %.5f\n",array_of_loss[i]->iterBatch,array_of_loss[i]->avgLoss,array_of_loss[i]->maxImgLoss);
 
         fwrite(&cr, sizeof(char), 1, fp);
         fwrite(&lf, sizeof(char), 1, fp);

@@ -25,6 +25,8 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
     list *list_mAP = make_list();
+    _mAP *mAP = 0;
+                
     list *list_loss = make_list();
     _lossAcc *lossAcc = 0;
     
@@ -263,12 +265,14 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             // combine Training and Validation networks
             //network net_combined = combine_train_valid_networks(net, net_map);
 
-            _mAP mAP;
-            mAP.iterBatch = i;
+            mAP = (_mAP*)malloc(sizeof(_mAP));
+            list_insert(list_mAP, mAP);
+            
+            mAP->iterBatch = i;
             iter_map = i;
-            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map, &mAP);// &net_combined);
+            mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map, mAP);// &net_combined);
             printf("\n mean_average_precision (mAP@%.2f) = %f \n", tresh_IoU, mean_average_precision);
-            list_insert(list_mAP, &mAP);
+            list_insert(list_mAP, mAP);
             
             draw_precision = 1;
         }
@@ -281,7 +285,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         lossAcc->avgLoss = avg_loss;
         lossAcc->maxImgLoss = max_img_loss;
         
-        printf("%d %.5f %.5f\n",lossAcc->iterBatch,lossAcc->avgLoss,lossAcc->maxImgLoss);
+        //printf("%d %.5f %.5f\n",lossAcc->iterBatch,lossAcc->avgLoss,lossAcc->maxImgLoss);
         
 #ifdef OPENCV
         draw_train_loss(img, img_size, avg_loss, max_img_loss, i, net.max_batches, mean_average_precision, draw_precision, "mAP%", dont_show, mjpeg_port);
@@ -304,7 +308,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             save_mAP(list_mAP, buff_mAP);
         }
 
-        if (i >= (iter_save_last + 10) || i % 10 == 0) {
+        if (i >= (iter_save_last + 100) || i % 100 == 0) {
             iter_save_last = i;
 #ifdef GPU
             if (ngpus != 1) sync_nets(nets, ngpus, 0);
