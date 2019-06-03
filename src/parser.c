@@ -1134,13 +1134,11 @@ void save_loss(list *list_loss, char* filename) {
         avg_loss = array_of_loss[i]->avgLoss;
         max_img_loss = array_of_loss[i]->maxImgLoss;
 
-        for(int j=0; j<100; j++) {
-            fwrite(&cr, sizeof(char), 1, fp);
-            fwrite(&lf, sizeof(char), 1, fp);
-            fwrite(&iter, sizeof(int), 1, fp);
-            fwrite(&avg_loss, sizeof(float), 1, fp);
-            fwrite(&max_img_loss, sizeof(float), 1, fp);
-        }
+        fwrite(&cr, sizeof(char), 1, fp);
+        fwrite(&lf, sizeof(char), 1, fp);
+        fwrite(&iter, sizeof(int), 1, fp);
+        fwrite(&avg_loss, sizeof(float), 1, fp);
+        fwrite(&max_img_loss, sizeof(float), 1, fp);
     }
     
     fclose(fp);

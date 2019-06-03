@@ -313,7 +313,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff_loss[256];
             sprintf(buff_loss, "%s/%s_last.loss", backup_directory, base);
             save_loss(list_loss,buff_loss);
-            free_list_contents(list_loss);
+            free_list(list_loss);
         }
         free_data(train);
     }
