@@ -1211,13 +1211,12 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
             }
             
             char* filename = remove_ext(path);
-            printf("\n%s\n",filename);
+            char* filename2save = (char*)calloc(8192, sizeof(char));
+            sprintf(filename2save, "/tesis/detect/%s", filename);
+            printf("\n%s\n",filename2save);
             
-            /*
-            char* buff_file_name = (char*)calloc(8192, sizeof(char));
-            sprintf(buff_file_name, "/tesis/detect%s", path);
-            draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
-            save_image(buf[image_index], buff_file_name);*/
+            //draw_detections_v3(buf[image_index], dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            //save_image(buf[image_index], buff_file_name);
 
             // difficult
             box_label *truth_dif = NULL;
