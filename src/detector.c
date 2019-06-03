@@ -24,7 +24,10 @@ static int coco_ids[] = { 1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear, int dont_show, int calc_map, int mjpeg_port, int show_imgs)
 {
+    list *list_mAP = make_list();
     _mAP mAP;
+    
+    list *list_loss = make_list();
     _lossAcc lossAcc;
     float tresh_IoU = 0.75f;
     
@@ -265,29 +268,23 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             iter_map = i;
             mean_average_precision = validate_detector_map(datacfg, cfgfile, weightfile, 0.25, tresh_IoU, 0, &net_map, &mAP);// &net_combined);
             printf("\n mean_average_precision (mAP@%.2f) = %f \n", tresh_IoU, mean_average_precision);
+            list_insert(list_mAP, &mAP);
             
             draw_precision = 1;
-            
-            //simpan ke binary mAP
-            char buff[256];
-            sprintf(buff, "%s/%s_last.mAP", backup_directory, base);
-            save_mAP(&mAP, buff);
         }
         
         lossAcc.iterBatch = i;
         lossAcc.avgLoss = avg_loss;
         lossAcc.maxImgLoss = max_img_loss;
+        list_insert(list_loss, &lossAcc);
         
-        char buff_loss[256];
-        sprintf(buff_loss, "%s/%s_last.loss", backup_directory, base);
-        save_loss(&lossAcc,buff_loss);
 #ifdef OPENCV
         draw_train_loss(img, img_size, avg_loss, max_img_loss, i, net.max_batches, mean_average_precision, draw_precision, "mAP%", dont_show, mjpeg_port);
 #endif    // OPENCV
 
         //if (i % 1000 == 0 || (i < 1000 && i % 100 == 0)) {
         //if (i % 100 == 0) {
-        if (i >= (iter_save + 500) || i % 500 == 0) {
+        if (i >= (iter_save + 1000) || i % 1000 == 0) {
             iter_save = i;
 #ifdef GPU
             if (ngpus != 1) sync_nets(nets, ngpus, 0);
@@ -297,7 +294,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             save_weights(net, buff);
         }
 
-        if (i >= (iter_save_last + 100) || i % 100 == 0) {
+        if (i >= (iter_save_last + 10) || i % 10 == 0) {
             iter_save_last = i;
 #ifdef GPU
             if (ngpus != 1) sync_nets(nets, ngpus, 0);
@@ -305,6 +302,18 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff[256];
             sprintf(buff, "%s/%s_last.weights", backup_directory, base);
             save_weights(net, buff);
+            
+            //simpan ke binary mAP
+            char buff_mAP[256];
+            sprintf(buff_mAP, "%s/%s_last.mAP", backup_directory, base);
+            save_mAP(list_mAP, buff_mAP);
+            free_list_contents(list_mAP);
+            
+            //simpan ke binary loss
+            char buff_loss[256];
+            sprintf(buff_loss, "%s/%s_last.loss", backup_directory, base);
+            save_loss(list_loss,buff_loss);
+            free_list_contents(list_loss);
         }
         free_data(train);
     }
@@ -340,6 +349,12 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         net_map.n = 0;
         free_network(net_map);
     }
+    
+    free_list_contents(list_mAP);
+    free_list(list_mAP);
+    
+    free_list_contents(list_loss);
+    free_list(list_loss);
 }
 
 

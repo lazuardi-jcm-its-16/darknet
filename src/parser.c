@@ -1099,25 +1099,33 @@ void save_weights(network net, char *filename)
     save_weights_upto(net, filename, net.n);
 }
 
-void save_mAP(_mAP* mAP, char* filename) {
+void save_mAP(list *list_mAP, char* filename) {
     fprintf(stderr, "Saving mAP to %s\n", filename);
     FILE *fp = fopen(filename, "wb");
     if(!fp) file_error(filename);
     
-    fwrite('\r', sizeof(char), 1, fp);
-    fwrite('\n', sizeof(char), 1, fp);
-    fwrite(mAP, sizeof(float), sizeof(_mAP), fp);
+    _mAP **array_of_mAP = (char **)list_to_array(list_mAP);
+    for(int i=0; i<list_mAP->size; i++) {
+        fwrite('\r', sizeof(char), 1, fp);
+        fwrite('\n', sizeof(char), 1, fp);
+        fwrite(array_of_mAP[i], sizeof(float), sizeof(_mAP), fp);
+    }
+     
     fclose(fp);
 }
 
-void save_loss(_lossAcc* lossAcc, char* filename) {
+void save_loss(list *list_loss, char* filename) {
     fprintf(stderr, "Saving loss to %s\n", filename);
     FILE *fp = fopen(filename, "wb");
     if(!fp) file_error(filename);
     
-    fwrite('\r', sizeof(char), 1, fp);
-    fwrite('\n', sizeof(char), 1, fp);
-    fwrite(lossAcc, sizeof(float), sizeof(_mAP), fp);
+    _mAP **array_of_loss = (char **)list_to_array(list_loss);
+    for(int i=0; i<list_loss->size; i++) {
+        fwrite('\r', sizeof(char), 1, fp);
+        fwrite('\n', sizeof(char), 1, fp);
+        fwrite(array_of_loss[i], sizeof(float), sizeof(_mAP), fp);
+    }
+    
     fclose(fp);
 }
 
