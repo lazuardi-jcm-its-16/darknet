@@ -272,7 +272,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             
             draw_precision = 1;
         }
-        
+        printf("%d\n",i);
         lossAcc.iterBatch = i;
         lossAcc.avgLoss = avg_loss;
         lossAcc.maxImgLoss = max_img_loss;
