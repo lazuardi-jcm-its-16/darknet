@@ -1119,7 +1119,7 @@ void save_mAP(list *list_mAP, char* filename) {
     float averageIoU;
     
     for(int i=0; i<list_mAP->size; i++) {
-        _mAP* item_mAP = list_pop(list_mAP);
+        _mAP* item_mAP = (_mAP*)list_pop(list_mAP);
         
         cr = 0x0d;
         lf = 0x0a;
@@ -1162,7 +1162,7 @@ void save_loss(list *list_loss, char* filename) {
     float iter,avg_loss,max_img_loss;
     
     for(int i=0; i<list_loss->size; i++) {
-        _lossAcc* item_loss = list_pop(list_loss);
+        _lossAcc* item_loss = (_lossAcc*)list_pop(list_loss);
         
         cr = 0x0d;
         lf = 0x0a;
