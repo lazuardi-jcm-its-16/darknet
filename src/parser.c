@@ -1124,12 +1124,20 @@ void save_loss(list *list_loss, char* filename) {
     _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
     
+    float data_test = 26.0f;
+    
     for(int i=0; i<list_loss->size; i++) {
+        
+        for(int j=0; j<256; j++) {
+            fwrite(&data_test, sizeof(float), sizeof(float), fp);
+        }
+        
+        /*
         fwrite('\r', sizeof(char), 1, fp);
         fwrite('\n', sizeof(char), 1, fp);
         fwrite(&array_of_loss[i]->iterBatch, sizeof(int), 1, fp);
         fwrite(&array_of_loss[i]->avgLoss, sizeof(float), 1, fp);
-        fwrite(&array_of_loss[i]->maxImgLoss, sizeof(float), 1, fp);
+        fwrite(&array_of_loss[i]->maxImgLoss, sizeof(float), 1, fp);*/
     }
     
     fclose(fp);
