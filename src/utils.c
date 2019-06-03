@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <libgen.h>
 #include <string.h>
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
@@ -266,8 +267,12 @@ void replace_image_to_label(const char* input_path, char* output_path)
     }
 }
 
-char *remove_ext (char* mystr, char dot, char sep) {
-    char *retstr, *lastdot, *lastsep;
+char *remove_ext (char* mystr) {
+    char* ts1 = strdup(mystr);
+    char* filename = basename(ts1);
+    
+    return filenamel
+    /*char *retstr, *lastdot, *lastsep;
 
     // Error checks and allocate string.
     if (mystr == NULL)
@@ -296,7 +301,7 @@ char *remove_ext (char* mystr, char dot, char sep) {
     }
 
     // Return the modified string.
-    return retstr;
+    return retstr;*/
 }
 
 float sec(clock_t clocks)

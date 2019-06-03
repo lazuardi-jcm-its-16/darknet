@@ -8,9 +8,6 @@
 #include "demo.h"
 #include "option_list.h"
 
-#include <libgen.h>
-#include <string.h>
-
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T
 typedef int (*__compar_fn_t)(const void*, const void*);
@@ -1213,8 +1210,7 @@ float validate_detector_map_bulk(char *datacfg, char *cfgfile, char *weightfile,
                         1,0.0f,0.0f,.1f);*/
             }
             
-            char* ts1 = strdup(path);
-            char* filename = basename(ts1);
+            char* filename = remove_ext(path);
             printf("\n%s\n",filename);
             
             /*
