@@ -1160,17 +1160,25 @@ void save_loss(list *list_loss, char* filename) {
     FILE *fp = fopen(filename, "ab");
     if(!fp) file_error(filename);
     
-    _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
+    //_lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
  
     for(int i=0; i<list_loss->size; i++) {
+        _lossAcc *loss = (_lossAcc*)list_pop(list_loss);
+        /*
         char cr = 0x0d;
         char lf = 0x0a;
         int iter = array_of_loss[i]->iterBatch;
         float avg_loss = array_of_loss[i]->avgLoss;
-        float max_img_loss = array_of_loss[i]->maxImgLoss;
+        float max_img_loss = array_of_loss[i]->maxImgLoss;*/
         
-        printf("%d %.5f %.5f\n",array_of_loss[i]->iterBatch,array_of_loss[i]->avgLoss,array_of_loss[i]->maxImgLoss);
+        char cr = 0x0d;
+        char lf = 0x0a;
+        int iter = loss->iterBatch;
+        float avg_loss = loss->avgLoss;
+        float max_img_loss = loss->maxImgLoss;
+        
+        printf("%d %.5f %.5f\n",loss->iterBatch,loss->avgLoss,loss->maxImgLoss);
 
         fwrite(&cr, sizeof(char), 1, fp);
         fwrite(&lf, sizeof(char), 1, fp);
