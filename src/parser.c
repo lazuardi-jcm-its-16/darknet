@@ -1104,7 +1104,7 @@ void save_mAP(list *list_mAP, char* filename) {
     FILE *fp = fopen(filename, "wb");
     if(!fp) file_error(filename);
     
-    _mAP **array_of_mAP = (char **)list_to_array(list_mAP);
+    _mAP **array_of_mAP = (_mAP **)list_to_array(list_mAP);
     printf("size mAP: %d\n",list_mAP->size);
     /*
     for(int i=0; i<list_mAP->size; i++) {
@@ -1121,7 +1121,7 @@ void save_loss(list *list_loss, char* filename) {
     FILE *fp = fopen(filename, "wb");
     if(!fp) file_error(filename);
     
-    _lossAcc **array_of_loss = (char **)list_to_array(list_loss);
+    _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
     /*
     for(int i=0; i<list_loss->size; i++) {
