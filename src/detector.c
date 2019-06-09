@@ -1113,15 +1113,19 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
 }
 
 void check(char *datacfg) {
+    image **alphabet = load_alphabet();
     list *options = read_data_cfg(datacfg);
     char *valid_images = option_find_str(options, "valid", "data/train.txt");
     
     list *plist = get_paths(valid_images);
     char **paths = (char **)list_to_array(plist);
 
-    int m = plist->size;
+    float rgb[3];
     
-    for(int i = 0; i < m; i++) {
+    
+    int m = plist->size;
+    int i,j ;
+    for(i = 0; i < m; i++) {
         char *path = paths[i];
         //printf("%s\n",path);
         
@@ -1132,7 +1136,7 @@ void check(char *datacfg) {
         int num_labels = 0;
         box_label *truth = read_boxes(labelpath, &num_labels);
 
-        for (int j = 0; j < num_labels; ++j) {
+        for (j = 0; j < num_labels; ++j) {
             
             int width = im.h * .003;
             if (width < 1)
@@ -1148,8 +1152,31 @@ void check(char *datacfg) {
             if (top < 0) top = 0;
             if (bot > im.h - 1) bot = im.h - 1;
 
-            //printf("truth: %.2f %.2f %.2f %.2f %.d %.d\n",truth[j].x,truth[j].y,truth[j].w,truth[j].h,im.w,im.h);
-            draw_box_width(im, left, top, right, bot, width, 0.0f,1.0f,0.0f); // 3 channels RGB          
+            char labelstr[4096] = { 0 };
+            if(truth[j].id == 0) {
+                sprintf(labelstr, "bone"); 
+                rgb[0] = .0f;
+                rgb[1] = 1.0f;
+                rgb[2] = .0f;
+                
+                
+            }
+            else if(truth[j].id == 1) {
+                sprintf(labelstr, "another"); 
+                rgb[0] = 1.0f;
+                rgb[1] = .0f;
+                rgb[2] = .0f;
+            }
+            else if(truth[j].id == 2) {
+                sprintf(labelstr, "shadow"); 
+                rgb[0] = .0f;
+                rgb[1] = .0f;
+                rgb[2] = 1.0f;
+            }   
+        
+            image label = get_label_v3(alphabet, labelstr, (im.h*.01));
+            draw_label(im, top + width, left, label, rgb);
+            draw_box_width(im, left, top, right, bot, width, rgb[0] ,rgb[1],rgb[2]); // 3 channels RGB 
         }
 
         char* filename = remove_ext(path);
@@ -1520,8 +1547,9 @@ void test_detector_bulk(char* datacfg, char* cfgfile, char* weightfile, float th
     }
     int j;
     float nms = .45;    // 0.4F
+    int idx;
     //while (1) {
-    for(int idx=0; idx<plist->size; idx++) {
+    for(idx=0; idx<plist->size; idx++) {
         strncpy(input, paths[idx], 256);
         if (strlen(input) > 0)
             if (input[strlen(input) - 1] == 0x0d) input[strlen(input) - 1] = 0;
@@ -1529,7 +1557,15 @@ void test_detector_bulk(char* datacfg, char* cfgfile, char* weightfile, float th
         //image im;
         //image sized = load_image_resize(input, net.w, net.h, net.c, &im);
         image im = load_image(input, 0, 0, net.c);
+        image im2 = load_image(input, 0, 0, net.c);
         image sized = resize_image(im, net.w, net.h);
+        
+        char labelpath[4096];
+        replace_image_to_label(paths[idx], labelpath);
+        
+        int num_labels = 0;
+        box_label *truth = read_boxes(labelpath, &num_labels);
+ 
         int letterbox = 0;
         //image sized = letterbox_image(im, net.w, net.h); letterbox = 1;
         layer l = net.layers[net.n - 1];
@@ -1547,15 +1583,25 @@ void test_detector_bulk(char* datacfg, char* cfgfile, char* weightfile, float th
         printf("%s: Predicted in %lf milli-seconds.\n", input, ((double)get_time_point() - time) / 1000);
         //printf("%s: Predicted in %f seconds.\n", input, (what_time_is_it_now()-time));
 
-        char* filename = remove_ext(input);
-        char* filename2save = (char*)calloc(8192, sizeof(char));
-        sprintf(filename2save, "/tesis/detect/%s", filename);
+        
         
         int nboxes = 0;
         detection *dets = get_network_boxes(&net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes, letterbox);
         if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
-        draw_detections_v3(im, dets, nboxes, thresh, names, alphabet, l.classes, ext_output);
+        //draw_detections_v3(im, dets, nboxes, thresh, names, alphabet, l.classes, ext_output);
+        float best_iou = draw_detections_v3rif(im, im2, truth, num_labels, dets, nboxes, thresh, names, alphabet, l.classes, ext_output);
+        
+        char* filename = remove_ext(input);
+        char* filename2save = (char*)calloc(8192, sizeof(char));
+        //sprintf(filename2save, "/tesis/detect/%s", filename);
+        sprintf(filename2save, "results/%.2f_%s", best_iou, filename);  
         save_image(im, filename2save);
+        printf("saved: %s \n", filename2save);
+        
+        sprintf(filename2save, "results/%.2f_%s_2", best_iou, filename);  
+        save_image(im2, filename2save);
+        printf("saved: %s \n", filename2save);
+        
         if (!dont_show) {
             show_image(im, filename);
         }
@@ -1575,9 +1621,6 @@ void test_detector_bulk(char* datacfg, char* cfgfile, char* weightfile, float th
         // pseudo labeling concept - fast.ai
         if (save_labels)
         {
-            char labelpath[4096];
-            replace_image_to_label(input, labelpath);
-
             FILE* fw = fopen(labelpath, "wb");
             int i;
             for (i = 0; i < nboxes; ++i) {
@@ -1606,8 +1649,6 @@ void test_detector_bulk(char* datacfg, char* cfgfile, char* weightfile, float th
             wait_until_press_key_cv();
             destroy_all_windows_cv();
         }
-
-        if (filename) break;
     }
 
     if (outfile) {

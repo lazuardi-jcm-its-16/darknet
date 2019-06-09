@@ -1118,8 +1118,8 @@ void save_mAP(list *list_mAP, char* filename) {
     float F1;
     float mAPValue;
     float averageIoU;
-    
-    for(int i=0; i<list_mAP->size; i++) {
+    int i;
+    for(i=0; i<list_mAP->size; i++) {
         cr = 0x0d;
         lf = 0x0a;
         iterBatch = array_of_mAP[i]->iterBatch;
@@ -1148,7 +1148,7 @@ void save_mAP(list *list_mAP, char* filename) {
     }
     
     int size_list = list_mAP->size;
-    for(int i=0; i<size_list; i++) {
+    for(i=0; i<size_list; i++) {
         list_pop(list_mAP);
     }
      
@@ -1162,8 +1162,8 @@ void save_loss(list *list_loss, char* filename) {
     
     _lossAcc **array_of_loss = (_lossAcc **)list_to_array(list_loss);
     printf("size loss: %d\n",list_loss->size);
- 
-    for(int i=0; i<list_loss->size; i++) {
+    int i;
+    for(i=0; i<list_loss->size; i++) {
         char cr = 0x0d;
         char lf = 0x0a;
         int iter = array_of_loss[i]->iterBatch;
@@ -1180,7 +1180,7 @@ void save_loss(list *list_loss, char* filename) {
     }
     
     int size_list = list_loss->size;
-    for(int i=0; i<size_list; i++) {
+    for(i=0; i<size_list; i++) {
         list_pop(list_loss);
     }
     
